@@ -1,53 +1,93 @@
 header {
+    position: relative;
     display: flex;
     justify-content: space-around;
     align-items: center;
     padding: 10px;
     background-color: transparent;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(148, 145, 145, 0.1);
     margin: 0 auto;
 }
 
-header h1 {
-    font-size: 2rem;
-    color: var(--color);
-}
-
-header ul {
-    margin: 0;
-    padding: 0;
+header div {
     display: flex;
-    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
-    gap: 20px;
+    gap: 50px;
 }
 
-header ul li {
-    list-style: none;
-    padding: 0 25px;
-    cursor: pointer;
-    background-color: var(--background-color);
+header h1 {
+    font-size: 1.4rem;
     color: var(--color);
-    outline: none;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-style: normal;
 }
 
-header ul li.active {
-    transform: scale(1.1);
+header h1 span {
+    font-size: 1.8rem;
+    color: rgb(98, 121, 255);
 }
 
 header .theme-toggler {
     border: none;
     outline: none;
-    background-color: var(--background-color);
+    background-color: transparent;
     color: var(--color);
-    font-size: 1rem;
+    font-size: 1.2rem;
+    padding: 0;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    background-color: transparent;
+    margin: 0 auto;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(148, 145, 145, 0.1);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.menu ul {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 50px;
+}
+
+.menu ul li {
+    list-style: none;
     padding: 0;
     margin: 0;
     cursor: pointer;
+    background-color: transparent;
+    color: var(--color);
+    outline: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-style: normal;
+}
+
+.menu ul li.active {
+    transform: scale(1.2);
+    color: rgb(98, 121, 255);
 }
