@@ -1,0 +1,53 @@
+header {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
+    background-color: transparent;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+}
+
+header h1 {
+    font-size: 2rem;
+    color: var(--color);
+}
+
+header ul {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+}
+
+header ul li {
+    list-style: none;
+    padding: 0 25px;
+    cursor: pointer;
+    background-color: var(--background-color);
+    color: var(--color);
+    outline: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+header ul li.active {
+    transform: scale(1.1);
+}
+
+header .theme-toggler {
+    border: none;
+    outline: none;
+    background-color: var(--background-color);
+    color: var(--color);
+    font-size: 1rem;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
