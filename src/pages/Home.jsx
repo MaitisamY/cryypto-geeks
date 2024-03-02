@@ -5,57 +5,61 @@ import { BsFillCaretDownFill, BsFillCaretUpFill, BsSearch } from 'react-icons/bs
 import Card from '../components/Card'
 function Home() {
   const [coins, setCoins] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [originalCoins, setOriginalCoins] = useState(null);
 
-  useEffect(() => {
-    const API_URL = import.meta.env.VITE_API_URL_BY_VOL_FULL;
-    const API_KEY = import.meta.env.VITE_API_KEY;
-    const fetchCoins = async () => {
-      try {
-        const response = await axios.get(API_URL + '?limit=100&tsym=USD&api_key=' + API_KEY);
-        setCoins(response.data.Data);
-        console.log(response.data.Data);
-      } catch (error) {
-        console.error(error);
-        setCoins({ error: error.message });
-      }
+    useEffect(() => {
+        const API_URL = import.meta.env.VITE_API_URL_BY_VOL_FULL;
+        const API_KEY = import.meta.env.VITE_API_KEY;
+        
+        const fetchCoins = async () => {
+            try {
+                const response = await axios.get(`${API_URL}?limit=100&tsym=USD&api_key=${API_KEY}`);
+                setCoins(response.data.Data);
+                setOriginalCoins(response.data.Data);
+            } catch (error) {
+                console.error(error);
+                setCoins({ error: error.message });
+            }
+        };
+        
+        fetchCoins();
+        
+        const pollingInterval = 60 * 60 * 1000;
+        const intervalId = setInterval(fetchCoins, pollingInterval);
+        
+        return () => clearInterval(intervalId);
+    }, []);
+
+    const handleSearch = (event) => {
+        setSearchQuery(event.target.value);
+        setCurrentPage(1); // Reset pagination when searching
     };
-    fetchCoins();
 
-    const pollingInterval = 60 * 60 * 1000;
-    const intervalId = setInterval(fetchCoins, pollingInterval);
-    return () => clearInterval(intervalId);
+    const handleNextPage = () => {
+        setCurrentPage(currentPage + 1);
+    };
 
-  }, []);
+    const handlePreviousPage = () => {
+        setCurrentPage(currentPage - 1);
+    };
 
-  /* Row Selection, Filtering and Pagination Logics */
-  const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = currentPage * rowsPerPage;
-  const currentRows = coins ? coins.slice(startIndex, endIndex) : [];
-  const totalPages = coins ? Math.ceil(coins.length / rowsPerPage) : 0;
+    const handleShowRows = (event) => {
+        setRowsPerPage(parseInt(event.target.value));
+        setCurrentPage(1); // Reset pagination when changing rows per page
+    };
 
-  const handleNextPage = () => {
-    setCurrentPage(currentPage + 1);
-  }
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = currentPage * rowsPerPage;
+    const filteredCoins = coins && searchQuery.length >= 1
+        ? coins.filter((coin) => coin.CoinInfo.FullName.toLowerCase().includes(searchQuery.toLowerCase()))
+        : coins;
+    const currentRows = filteredCoins ? filteredCoins.slice(startIndex, endIndex) : [];
 
-  const handlePreviousPage = () => {
-    setCurrentPage(currentPage - 1);
-  }
+    const totalPages = filteredCoins ? Math.ceil(filteredCoins.length / rowsPerPage) : 0;
 
-  const handleSearch = (event) => {
-    const searchTerm = event.target.value;
-    setSearchQuery(searchTerm);
-
-    const filteredCoins = coins.filter((coin) => coin.CoinName.toLowerCase().includes(searchQuery.toLowerCase()));
-    setCoins(filteredCoins);
-  }
-
-  const handleShowRows = (event) => {
-    const rowsValue = event.target.value;
-    setRowsPerPage(parseInt(rowsValue));
-  }
 
   return (
     <div className="home">{/* Main Container */}
@@ -94,7 +98,7 @@ function Home() {
             {coins ? (
               currentRows.map((coin, index) => (
                 <tr key={index}>
-                  <td className="text-left">{rowsPerPage * (currentPage - 1) + index + 1}</td>
+                  <td className="text-left">{coins.indexOf(coin) + 1}</td>
                   <td>
                     <Link target='_blank' className="coin-identity" to={`https://www.cryptocompare.com${coin.CoinInfo.Url}`}>
                       <img src={`https://www.cryptocompare.com${coin.CoinInfo.ImageUrl}`} alt={coin.CoinInfo.FullName} />
