@@ -28,7 +28,6 @@ function Home() {
   }, []);
 
   /* Row Selection, Filtering and Pagination Logics */
-
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -36,7 +35,6 @@ function Home() {
   const endIndex = currentPage * rowsPerPage;
   const currentRows = coins ? coins.slice(startIndex, endIndex) : [];
   const totalPages = coins ? Math.ceil(coins.length / rowsPerPage) : 0;
-  let i = 1;
 
   const handleNextPage = () => {
     setCurrentPage(currentPage + 1);
@@ -96,7 +94,7 @@ function Home() {
             {coins ? (
               currentRows.map((coin, index) => (
                 <tr key={index}>
-                  <td className="text-left">{i++}</td>
+                  <td className="text-left">{rowsPerPage * (currentPage - 1) + index + 1}</td>
                   <td>
                     <Link target='_blank' className="coin-identity" to={`https://www.cryptocompare.com${coin.CoinInfo.Url}`}>
                       <img src={`https://www.cryptocompare.com${coin.CoinInfo.ImageUrl}`} alt={coin.CoinInfo.FullName} />
