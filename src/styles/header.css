@@ -45,8 +45,6 @@ header .theme-toggler {
 }
 
 .menu {
-    position: sticky;
-    top: 0;
     width: 100%;
     height: auto;
     box-sizing: border-box;
@@ -60,7 +58,6 @@ header .theme-toggler {
     border-bottom: 1px solid rgba(148, 145, 145, 0.1);
     backdrop-filter: blur(5px);
     box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.1);
-    z-index: 100;
 }
 
 .menu ul {

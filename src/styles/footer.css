@@ -1,0 +1,19 @@
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    padding: 20px;
+    margin: 0 auto;
+    background-color: var(--background-color);
+    border-top: 1px solid rgba(148, 145, 145, 0.1);
+}
+
+footer p {
+    font-size: 0.93rem;
+    color: var(--color);
+    font-weight: 500;
+    font-style: normal;
+    padding: 0;
+}

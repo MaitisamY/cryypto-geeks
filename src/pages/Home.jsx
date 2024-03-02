@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { BsCaretDown, BsCaretUp, BsFillCaretDownFill, BsFillCaretUpFill } from 'react-icons/bs'
+import { BsFillCaretDownFill, BsFillCaretUpFill, BsSearch } from 'react-icons/bs'
+import Card from '../components/Card'
 function Home() {
   const [coins, setCoins] = useState(null);
 
@@ -10,7 +11,7 @@ function Home() {
     const API_KEY = import.meta.env.VITE_API_KEY;
     const fetchCoins = async () => {
       try {
-        const response = await axios.get(API_URL + '&api_key=' + API_KEY);
+        const response = await axios.get(API_URL + '?limit=100&tsym=USD&api_key=' + API_KEY);
         setCoins(response.data.Data);
         console.log(response.data.Data);
       } catch (error) {
@@ -20,73 +21,151 @@ function Home() {
     };
     fetchCoins();
 
-    // Polling interval in milliseconds (e.g., every 5 minutes)
-    const pollingInterval = 5 * 60 * 1000;
-
-    // Start polling
+    const pollingInterval = 60 * 60 * 1000;
     const intervalId = setInterval(fetchCoins, pollingInterval);
-
-    // Clear interval on component unmount
     return () => clearInterval(intervalId);
 
   }, []);
 
+  /* Row Selection, Filtering and Pagination Logics */
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = currentPage * rowsPerPage;
+  const currentRows = coins ? coins.slice(startIndex, endIndex) : [];
+  const totalPages = coins ? Math.ceil(coins.length / rowsPerPage) : 0;
+  let i = 1;
+
+  const handleNextPage = () => {
+    setCurrentPage(currentPage + 1);
+  }
+
+  const handlePreviousPage = () => {
+    setCurrentPage(currentPage - 1);
+  }
+
+  const handleSearch = (event) => {
+    const searchTerm = event.target.value;
+    setSearchQuery(searchTerm);
+
+    const filteredCoins = coins.filter((coin) => coin.CoinName.toLowerCase().includes(searchQuery.toLowerCase()));
+    setCoins(filteredCoins);
+  }
+
+  const handleShowRows = (event) => {
+    const rowsValue = event.target.value;
+    setRowsPerPage(parseInt(rowsValue));
+  }
+
   return (
-    <div className="home">
-      <h1>Cryptocurrencies</h1>
-      <table>
-        <thead>
-        <tr>
-          <th className="text-left">#</th>
-          <th className="text-left">Coin Name</th>
-          <th className="text-right">Market Cap</th>
-          <th className="text-right">Price</th>
-          <th className="text-right">Volume 24h</th>
-          <th className="text-right">Change 1h</th>
-        </tr>
-        </thead>
-        <tbody>
-          {coins ? (
-            coins.map((coin, index) => (
-              <tr key={coin.CoinInfo.Id}>
-                <td className="text-left">{index + 1}</td>
-                <td>
-                  <Link target='_blank' className="coin-identity" to={`https://www.cryptocompare.com${coin.CoinInfo.Url}`}>
-                    <img src={`https://www.cryptocompare.com${coin.CoinInfo.ImageUrl}`} alt={coin.CoinInfo.FullName} />
-                    {coin.CoinInfo.FullName}
-                    <span>{coin.CoinInfo.Internal}</span>
-                  </Link>
-                </td>
-                {coin.RAW && coin.RAW.USD ? (
-                  <>
-                    <td className="text-right">{coin.RAW.USD.MKTCAP}</td>
-                    <td className="text-right">{coin.RAW.USD.PRICE}</td>
-                    <td className="text-right">{coin.RAW.USD.VOLUME24HOUR}</td>
-                    <td className="text-right">
-                      {coin.RAW.USD.CHANGEHOUR > 0 ? (
-                        <span className="increment">
-                          <BsFillCaretUpFill /> {coin.RAW.USD.CHANGEHOUR.toString().substring(0, 12).replace('-', '')}... %
-                        </span>
-                      ) : (
-                        <span className="decrement">
-                          <BsFillCaretDownFill /> {coin.RAW.USD.CHANGEHOUR.toString().substring(1, 12).replace('-', '')}... %
-                        </span>
-                      )}
-                    </td>
-                    {/* Add more properties as needed */}
-                  </>
-                ) : (
-                  <td className="text-center" colSpan="4">Data not available</td>
-                )}
+    <div className="home">{/* Main Container */}
+      <div className="crypto-cards-container">{/* Cards Container */}
+          <Card>
+              <h1>Cryptocurrencies</h1>
+          </Card>
+      </div>
+      <div className="controllers">
+          <form>
+              <span><BsSearch /></span> 
+              <input type="text" name="search" value={searchQuery} placeholder="Search..." onChange={handleSearch} />
+          </form>
+          <div className="show-rows">
+              <label>Show rows:</label>
+              <select onChange={handleShowRows}>
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+              </select>
+          </div>
+      </div>
+      <div className="crypto-table-wrapper">{/* Table Wrapper Container */}
+        <table id="crypto-table">
+          <thead>
+          <tr>
+            <th className="text-left">#</th>
+            <th className="text-left">Coin Name</th>
+            <th className="text-right">Market Cap</th>
+            <th className="text-right">Price</th>
+            <th className="text-right">Volume 24h</th>
+            <th className="text-right">Change 24h</th>
+          </tr>
+          </thead>
+          <tbody>
+            {coins ? (
+              currentRows.map((coin, index) => (
+                <tr key={index}>
+                  <td className="text-left">{i++}</td>
+                  <td>
+                    <Link target='_blank' className="coin-identity" to={`https://www.cryptocompare.com${coin.CoinInfo.Url}`}>
+                      <img src={`https://www.cryptocompare.com${coin.CoinInfo.ImageUrl}`} alt={coin.CoinInfo.FullName} />
+                      {coin.CoinInfo.FullName}
+                      <span>{coin.CoinInfo.Internal}</span>
+                    </Link>
+                  </td>
+                  {coin.RAW && coin.RAW.USD ? (
+                    <>
+                      <td className="text-right">
+                        $ {coin.RAW.USD.MKTCAP ? (parseFloat(coin.RAW.USD.MKTCAP).toFixed(2) >= 1000000 ? 
+                        (parseFloat(coin.RAW.USD.MKTCAP) / 1000000).toFixed(2) + 'M' : 
+                        parseFloat(coin.RAW.USD.MKTCAP).toFixed(2)) : '0.00'}
+                      </td>
+                      <td className="text-right">
+                        $ {coin.RAW.USD.PRICE ? parseFloat(coin.RAW.USD.PRICE).toFixed(2) : '0.00'}
+                      </td>
+                      <td className="text-right">
+                        $ {coin.RAW.USD.VOLUME24HOUR ? (parseFloat(coin.RAW.USD.VOLUME24HOUR).toFixed(2) >= 1000000 ? 
+                        (parseFloat(coin.RAW.USD.VOLUME24HOUR) / 1000000).toFixed(2) + 'M' : 
+                        parseFloat(coin.RAW.USD.VOLUME24HOUR).toFixed(2)) : '0.00'}
+                      </td>
+                      <td className="text-right">
+                        {coin.RAW.USD.CHANGE24HOUR > 0 ? (
+                          <span className="increment">
+                            <BsFillCaretUpFill /> {Math.abs(parseFloat(coin.RAW.USD.CHANGE24HOUR)).toFixed(2)}... %
+                          </span>
+                        ) : (
+                          <span className="decrement">
+                            <BsFillCaretDownFill /> {Math.abs(parseFloat(coin.RAW.USD.CHANGE24HOUR)).toFixed(2)}... %
+                          </span>
+                        )}
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="text-right">--</td>
+                      <td className="text-right">--</td>
+                      <td className="text-right">--</td>
+                      <td className="text-right">--</td>
+                    </>
+                  )}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5">Loading...</td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="5">Loading...</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+        <div className="crypto-pagination">
+            <p className="page-info">Page {currentPage} of {totalPages}</p>
+            <div className="btn-group">
+                <button 
+                    onClick={() => handlePreviousPage(currentPage - 1)} 
+                    disabled={currentPage === 1}
+                >
+                    Prev
+                </button>
+                <button  
+                    onClick={() => handleNextPage(currentPage + 1)} 
+                    disabled={currentPage === totalPages}
+                >
+                    Next
+                </button>
+            </div>
+        </div>
+      </div>
     </div>
   );
 }

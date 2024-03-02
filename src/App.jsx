@@ -3,20 +3,44 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import './styles/header.css';
 import './styles/page.css';
+import './styles/footer.css';
 const Home = lazy(() => import('./pages/Home'))
 const Exchanges = lazy(() => import('./pages/Exchanges'))
 const News = lazy(() => import('./pages/News'))
 import Header from './components/Header'
 import Loader from './components/Loader'
+import Footer from './components/Footer'
+import { BsChevronUp } from 'react-icons/bs'
 
 
 function App() {
   const storedPreference = localStorage.getItem('theme');
   const [isDarkMode, setIsDarkMode] = useState(storedPreference === 'dark');
+  const [scrollUp, setScrollUp] = useState(false);
+
+  const backToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   useEffect(() => {
     document.body.classList.toggle('dark-mode', isDarkMode);
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > 200) {
+        setScrollUp(true);
+      } else {
+        setScrollUp(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+    
   }, [isDarkMode]);
 
   const toggleDarkMode = () => {
@@ -35,6 +59,14 @@ function App() {
                       <Route path='/news' element={<News />} />
                   </Routes>
                 </main>
+                {
+                    scrollUp &&
+                    <BsChevronUp 
+                        className={`scroll-up ${scrollUp ? 'show' : ''}`} 
+                        onClick={backToTop}
+                    />
+                }
+                <Footer />
             </div>
         </Router>
     </Suspense>
