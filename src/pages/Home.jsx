@@ -100,7 +100,7 @@ function Home() {
                 <tr key={index}>
                   <td className="text-left">{coins.indexOf(coin) + 1}</td>
                   <td>
-                    <Link target='_blank' className="coin-identity" to={`https://www.cryptocompare.com${coin.CoinInfo.Url}`}>
+                    <Link className="coin-identity" to={`coin/${coin.CoinInfo.Internal}`}>
                       <img src={`https://www.cryptocompare.com${coin.CoinInfo.ImageUrl}`} alt={coin.CoinInfo.FullName} />
                       {coin.CoinInfo.FullName}
                       <span>{coin.CoinInfo.Internal}</span>

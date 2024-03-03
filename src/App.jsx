@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
-import './styles/header.css';
-import './styles/page.css';
-import './styles/footer.css';
+import './styles/header.css'
+import './styles/page.css'
+import './styles/footer.css'
 const Home = lazy(() => import('./pages/Home'))
 const Exchanges = lazy(() => import('./pages/Exchanges'))
 const News = lazy(() => import('./pages/News'))
+const Coin = lazy(() => import('./pages/Coin'))
 import Header from './components/Header'
 import Loader from './components/Loader'
 import Footer from './components/Footer'
@@ -57,6 +58,7 @@ function App() {
                       <Route path="/" element={<Home />} />
                       <Route path='/exchanges' element={<Exchanges />} />
                       <Route path='/news' element={<News />} />
+                      <Route path="/coin/:name" element={<Coin />} />
                   </Routes>
                 </main>
                 {

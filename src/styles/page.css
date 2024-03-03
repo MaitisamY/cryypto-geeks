@@ -5,6 +5,7 @@ main {
     align-items: center;
     width: 100%; /* Change this line */
     height: auto;
+    min-height: 82vh;
     flex-wrap: wrap;
     gap: 30px;
     padding: 20px;
