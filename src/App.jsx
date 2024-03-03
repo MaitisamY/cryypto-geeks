@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
+import './styles/index.css'
 import './styles/header.css'
-import './styles/page.css'
+import './styles/home.css'
+import './styles/coin.css'
 import './styles/footer.css'
 const Home = lazy(() => import('./pages/Home'))
 const Exchanges = lazy(() => import('./pages/Exchanges'))

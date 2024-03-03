@@ -4,6 +4,7 @@ import { Line } from 'react-chartjs-2'
 import 'chart.js/auto';
 export default function Coin() {
     const { name } = useParams();
+    const [coin, setCoin] = useState('');
     const [chartData, setChartData] = useState({
         labels: ['January', 'February', 'March', 'April'],
         datasets: [
@@ -64,8 +65,7 @@ export default function Coin() {
           x: {
             display: true,
             title: {
-              display: true,
-              text: 'Month',
+              display: false,
               font: {
                 size: 14,
                 weight: 600,
@@ -80,8 +80,7 @@ export default function Coin() {
           y: {
             display: true,
             title: {
-              display: true,
-              text: 'Value',
+              display: false,
               font: {
                 size: 14,
                 weight: 600,
@@ -107,13 +106,44 @@ export default function Coin() {
           autoplay: true,
           animationData: null,
           animationOptions: null
+        },
+        layout: {
+          padding: 10
         }
     };
+
+    useEffect(() => {
+        const API_URL = import.meta.env.VITE_API_URL_SINGLE_COIN_BY_SYMBOL;
+        const API_KEY = import.meta.env.VITE_API_KEY;
+        
+        const fetchThisCoin = async () => {
+            try {
+                const response = await axios.get(`${API_URL}?asset_symbol=${name}&api_key=${API_KEY}`);
+                setCoin(response.data.Data);
+            } catch (error) {
+                console.error(error);
+                setCoin({ error: error.message });
+            }
+        };
+        
+        fetchThisCoin();
+        
+        const pollingInterval = 60 * 60 * 1000;
+        const intervalId = setInterval(fetchThisCoin, pollingInterval);
+        
+        return () => clearInterval(intervalId);
+    }, []);
+
     return (
-        <>
-            <div style={{ height: '600px', width: '900px', margin: '0 auto', overflowX: 'auto' }}>
-                <Line data={chartData} options={options} />
+        <div className="coin">
+            <div className="crypto-coin-description">
+                <h1>{name}</h1>
             </div>
-        </>
+            <div className="crypto-coin-chart">
+                <div style={{ width: '100%', height: '75vh' }}>
+                  <Line data={chartData} options={options} />
+                </div>
+            </div>
+        </div>
     )
 }

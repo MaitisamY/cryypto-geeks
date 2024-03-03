@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { BsFillCaretDownFill, BsFillCaretUpFill, BsSearch } from 'react-icons/bs'
+import { BsFillCaretDownFill, BsFillCaretUpFill, BsSearch, BsChevronLeft, BsChevronRight } from 'react-icons/bs'
 import Card from '../components/Card'
 function Home() {
-  const [coins, setCoins] = useState(null);
+    const [coins, setCoins] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -26,6 +26,20 @@ function Home() {
         };
         
         fetchCoins();
+
+        function handleStickyColumns() {
+          var table = document.getElementById('crypto-table');
+          var minWidth = 992; 
+      
+          if (window.innerWidth < minWidth) {
+            table.classList.add('sticky-columns');
+          } else {
+            table.classList.remove('sticky-columns');
+          }
+        }
+      
+        handleStickyColumns();
+        window.addEventListener('resize', handleStickyColumns);
         
         const pollingInterval = 60 * 60 * 1000;
         const intervalId = setInterval(fetchCoins, pollingInterval);
@@ -60,6 +74,8 @@ function Home() {
 
     const totalPages = filteredCoins ? Math.ceil(filteredCoins.length / rowsPerPage) : 0;
 
+    
+
 
   return (
     <div className="home">{/* Main Container */}
@@ -71,10 +87,10 @@ function Home() {
       <div className="controllers">
           <form>
               <span><BsSearch /></span> 
-              <input type="text" name="search" value={searchQuery} placeholder="Search..." onChange={handleSearch} />
+              <input type="text" name="search" value={searchQuery} placeholder="Filter by coin name..." onChange={handleSearch} />
           </form>
           <div className="show-rows">
-              <label>Show rows:</label>
+              <label>Selected rows:</label>
               <select onChange={handleShowRows}>
                   <option value="10">10</option>
                   <option value="25">25</option>
@@ -110,15 +126,15 @@ function Home() {
                     <>
                       <td className="text-right">
                         $ {coin.RAW.USD.MKTCAP ? (parseFloat(coin.RAW.USD.MKTCAP).toFixed(2) >= 1000000 ? 
-                        (parseFloat(coin.RAW.USD.MKTCAP) / 1000000).toFixed(2) + 'M' : 
+                        (parseFloat(coin.RAW.USD.MKTCAP) / 1000000000).toFixed(2) + ' B' : 
                         parseFloat(coin.RAW.USD.MKTCAP).toFixed(2)) : '0.00'}
                       </td>
                       <td className="text-right">
                         $ {coin.RAW.USD.PRICE ? parseFloat(coin.RAW.USD.PRICE).toFixed(2) : '0.00'}
                       </td>
                       <td className="text-right">
-                        $ {coin.RAW.USD.VOLUME24HOUR ? (parseFloat(coin.RAW.USD.VOLUME24HOUR).toFixed(2) >= 1000000 ? 
-                        (parseFloat(coin.RAW.USD.VOLUME24HOUR) / 1000000).toFixed(2) + 'M' : 
+                        $ {coin.RAW.USD.VOLUME24HOUR ? (parseFloat(coin.RAW.USD.VOLUME24HOUR).toFixed(2) >= 1000000000 ? 
+                        (parseFloat(coin.RAW.USD.VOLUME24HOUR) / 1000000000).toFixed(2) + 'B' : 
                         parseFloat(coin.RAW.USD.VOLUME24HOUR).toFixed(2)) : '0.00'}
                       </td>
                       <td className="text-right">
@@ -150,23 +166,25 @@ function Home() {
             )}
           </tbody>
         </table>
-        <div className="crypto-pagination">
-            <p className="page-info">Page {currentPage} of {totalPages}</p>
-            <div className="btn-group">
-                <button 
-                    onClick={() => handlePreviousPage(currentPage - 1)} 
-                    disabled={currentPage === 1}
-                >
-                    Prev
-                </button>
-                <button  
-                    onClick={() => handleNextPage(currentPage + 1)} 
-                    disabled={currentPage === totalPages}
-                >
-                    Next
-                </button>
-            </div>
-        </div>
+      </div>
+      <div className="crypto-pagination">
+          <p>Current Page <span>{currentPage}</span>, out of total <span>{totalPages}</span> pages</p>
+          <div className="btn-group">
+              <button 
+                  onClick={() => handlePreviousPage(currentPage - 1)} 
+                  disabled={currentPage === 1}
+                  title={currentPage === 1 ? "On First Page - No Previous Page Available" : "Go Backward"}
+              >
+                  <BsChevronLeft />
+              </button>
+              <button  
+                  onClick={() => handleNextPage(currentPage + 1)} 
+                  disabled={currentPage === totalPages}
+                  title={currentPage === totalPages ? "On Last Page - No Next Page Available" : "Go Forward"}
+              >
+                  <BsChevronRight />
+              </button>
+          </div>
       </div>
     </div>
   );
