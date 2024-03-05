@@ -51,29 +51,29 @@ function App() {
   };
 
   return (
-    <Suspense fallback={<Loader />}>
-        <Router>
-            <div className={`theme ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
-                <Header mode={isDarkMode} setMode={toggleDarkMode} />
-                <main>
-                  <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path='/exchanges' element={<Exchanges />} />
-                      <Route path='/news' element={<News />} />
-                      <Route path="/coin/:name" element={<Coin />} />
-                  </Routes>
-                </main>
-                {
-                    scrollUp &&
-                    <BsChevronUp 
-                        className={`scroll-up ${scrollUp ? 'show' : ''}`} 
-                        onClick={backToTop}
-                    />
-                }
-                <Footer />
-            </div>
-        </Router>
-    </Suspense>
+      <Router>
+          <div className={`theme ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
+              <Header mode={isDarkMode} setMode={toggleDarkMode} />
+              <Suspense fallback={<Loader />}>
+              <main>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path='/exchanges' element={<Exchanges />} />
+                    <Route path='/news' element={<News />} />
+                    <Route path="/coin/overview/:name" element={<Coin />} />
+                </Routes>
+              </main>
+              </Suspense>
+              {
+                  scrollUp &&
+                  <BsChevronUp 
+                      className={`scroll-up ${scrollUp ? 'show' : ''}`} 
+                      onClick={backToTop}
+                  />
+              }
+              <Footer />
+          </div>
+      </Router>
   );
 }
 

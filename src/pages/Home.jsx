@@ -116,7 +116,7 @@ function Home() {
                 <tr key={index}>
                   <td className="text-left">{coins.indexOf(coin) + 1}</td>
                   <td>
-                    <Link className="coin-identity" to={`coin/${coin.CoinInfo.Internal}`}>
+                    <Link className="coin-identity" to={`coin/overview/${coin.CoinInfo.Internal}`}>
                       <img src={`https://www.cryptocompare.com${coin.CoinInfo.ImageUrl}`} alt={coin.CoinInfo.FullName} />
                       {coin.CoinInfo.FullName}
                       <span>{coin.CoinInfo.Internal}</span>

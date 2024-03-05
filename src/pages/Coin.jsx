@@ -1,7 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { Line } from 'react-chartjs-2'
 import 'chart.js/auto';
+import axios from 'axios'
+import ReactMarkdown from 'react-markdown';
+import convertUnixTimestamp from '../util/TimeStampChanger'
 export default function Coin() {
     const { name } = useParams();
     const [coin, setCoin] = useState('');
@@ -37,13 +41,7 @@ export default function Coin() {
             display: false
           },
           title: {
-            display: true,
-            text: `${name} Price`,
-            font: {
-              size: 24,
-              weight: 600,
-              style: 'normal',
-            },
+            display: false,
             color: 'var(--color)',
             padding: 10
           },
@@ -118,7 +116,7 @@ export default function Coin() {
         
         const fetchThisCoin = async () => {
             try {
-                const response = await axios.get(`${API_URL}?asset_symbol=${name}&api_key=${API_KEY}`);
+                const response = await axios.get(`${API_URL}symbol?asset_symbol=${name}&api_key=${API_KEY}`);
                 setCoin(response.data.Data);
             } catch (error) {
                 console.error(error);
@@ -128,17 +126,52 @@ export default function Coin() {
         
         fetchThisCoin();
         
-        const pollingInterval = 60 * 60 * 1000;
-        const intervalId = setInterval(fetchThisCoin, pollingInterval);
-        
+        // Fetch updated data every second
+        const intervalId = setInterval(fetchThisCoin, 1000);
+
         return () => clearInterval(intervalId);
     }, []);
+
+    useEffect(() => {
+        const metaData = () => {
+            document.title = `${coin.NAME} | Cryypto Geeks`;
+            const metaDescription = document.querySelector('meta[name="description"]');
+            if (metaDescription) {
+                metaDescription.setAttribute('content', coin.SEO_DESCRIPTION);
+            }
+        }
+    
+        metaData();
+    }, [coin]); // Add coin as a dependency
 
     return (
         <div className="coin">
             <div className="crypto-coin-description">
-                <h1>{name}</h1>
+                {
+                    coin && (
+                        <>
+                            <h1>
+                                <img src={coin.LOGO_URL} alt={coin.NAME} /> 
+                                {coin.NAME} <small>{coin.SYMBOL}</small>
+                            </h1>
+                            <h2>$ {coin.PRICE_USD ? parseFloat(coin.PRICE_USD).toFixed(2) : '0.00'}</h2>
+                            <h3>Last update: {convertUnixTimestamp(coin.PRICE_USD_LAST_UPDATE_TS)}</h3>
+                            <div className="two-rowed-table">
+                                <table>
+                                    <tr>
+                                        <th>Smart contract address</th>
+                                    </tr>
+                                    <tr>
+                                        <td>{coin.SMART_CONTRACT_ADDRESS}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <p><ReactMarkdown>{coin.ASSET_DESCRIPTION}</ReactMarkdown></p>
+                        </>
+                    )
+                }
             </div>
+            <div></div>
             <div className="crypto-coin-chart">
                 <div style={{ width: '100%', height: '75vh' }}>
                   <Line data={chartData} options={options} />
